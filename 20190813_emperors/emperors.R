@@ -12,12 +12,11 @@ BCEtransform <- function(date,BCE){
   # transform a positive BCE date to a negative
   # only when BCE is TRUE
   # NB: the year 0000 does not exist; this was the year 1 BCE
-  # so we make the year negative
-  # then add 1
+  # but the data has taken this into account already
+  # and emperors born in BCE have an adjusted year (eg born in 63BCE is 62 in the data)
   if(BCE){
   yr = as.numeric(format(date, "%Y"))
   date = date - years(2*yr)
-  date = date + years(1)
   }
   return(date)
 }
@@ -54,14 +53,16 @@ cause_level <- count(emperors,cause,sort=T)
 emperors$cause <- factor(emperors$cause, levels = rev(cause_level$cause))
 
 # adjust esthetics of plot
-cscale <- c(brewer.pal(8,"Spectral"),brewer.pal(5,"BuPu")[2:5],brewer.pal(4,"PiYG"))
 theme_set(theme_light(base_size = 12, base_family = "Courier"))
+cscale_killer <- c(brewer.pal(8,"Spectral"),brewer.pal(5,"BuPu")[2:5],brewer.pal(4,"PiYG"))
+cscale_rise <- cscale_killer[c(1,3,4,7,8,10,12,13)]
 
-# make plot
+
+# make plots
 emperors %>%
   ggplot(aes(x = cause, y = age_death)) +
   geom_jitter(aes(size = reign_duration, color=killer), width=0.2) +
-  scale_colour_manual(values=cscale) +
+  scale_colour_manual(values=cscale_killer) +
   coord_flip() +
   theme(panel.grid.major.x = element_line(linetype="dotted",color="darkgrey"),
         panel.grid.minor.x = element_line(linetype="dotted",color="lightgrey"),
@@ -74,4 +75,23 @@ emperors %>%
        x = "Cause of death",
        size = "Duration of reign",
        color = "Killed by",
+       caption = "data: Wikipedia / credit: Georgios Karamanis") 
+
+
+emperors %>%
+  ggplot(aes(x = cause, y = age_death)) +
+  geom_jitter(aes(size = reign_duration, color=rise), width=0.2) +
+  scale_colour_manual(values=cscale_rise) +
+  coord_flip() +
+  theme(panel.grid.major.x = element_line(linetype="dotted",color="darkgrey"),
+        panel.grid.minor.x = element_line(linetype="dotted",color="lightgrey"),
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        plot.caption = element_text(size = 8, color = "darkgrey")
+  ) +
+  labs(title = "Rise and fall of Roman Emperors",
+       y = "Age at death (years)",
+       x = "Cause of death",
+       size = "Duration of reign",
+       color = "Rise to power",
        caption = "data: Wikipedia / credit: Georgios Karamanis") 
