@@ -95,3 +95,44 @@ emperors %>%
        size = "Duration of reign",
        color = "Rise to power",
        caption = "data: Wikipedia / credit: Georgios Karamanis") 
+
+
+emperors %>%
+  ggplot(aes(x = cause, y = reign_duration)) +
+  geom_jitter(aes(size = age_death, color=rise), width=0.2, alpha=0.7) +
+  scale_colour_manual(values=cscale_rise) +
+  coord_flip() +
+  theme(panel.grid.major.x = element_line(linetype="dotted",color="darkgrey"),
+        panel.grid.minor.x = element_line(linetype="dotted",color="lightgrey"),
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        plot.caption = element_text(size = 8, color = "darkgrey")
+  ) +
+  labs(title = "Rise and fall of Roman Emperors",
+       size = "Age at death (years)",
+       x = "Cause of death",
+       y = "Duration of reign",
+       color = "Rise to power",
+       caption = "data: Wikipedia / credit: Georgios Karamanis") 
+
+# change levels to highest rise to power-count first
+rise_level <- count(emperors,rise,sort=T)
+emperors$rise <- factor(emperors$rise, levels = rev(rise_level$rise))
+
+emperors %>%
+  ggplot(aes(x = rise, y = reign_duration)) +
+  geom_jitter(aes(size = age_death, color=cause), width=0.2, alpha=0.7) +
+  scale_colour_manual(values=cscale_rise) +
+  coord_flip() +
+  theme(panel.grid.major.x = element_line(linetype="dotted",color="darkgrey"),
+        panel.grid.minor.x = element_line(linetype="dotted",color="lightgrey"),
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        plot.caption = element_text(size = 8, color = "darkgrey")
+  ) +
+  labs(title = "Rise and fall of Roman Emperors",
+       size = "Age at death (years)",
+       color = "Cause of death",
+       y = "Duration of reign",
+       x = "Rise to power",
+       caption = "data: Wikipedia / credit: Georgios Karamanis") 
